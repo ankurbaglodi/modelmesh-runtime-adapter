@@ -66,8 +66,8 @@ func main() {
 		os.Exit(1)
 	}
 	log.Info("runtime status: Model loaded", "response", resp2)
-
-	time.Sleep(30 * time.Second)
+	log.Info("sleeping....")
+	time.Sleep(3 * time.Second)
 
 	mmeshCtx, cancel = context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()

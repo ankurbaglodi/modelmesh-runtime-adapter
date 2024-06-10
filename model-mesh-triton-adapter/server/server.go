@@ -92,31 +92,38 @@ func (s *TritonAdapterServer) LoadModel(ctx context.Context, req *mmesh.LoadMode
 	log := s.Log.WithName("Load Model").WithValues("model_id", req.ModelId)
 	modelType := getModelType(req, log)
 	log.Info("Using model type", "model_type", modelType)
+	//if s.AdapterConfig.UseEmbeddedPuller {
+	//	var pullerErr error
+	//	req, pullerErr = s.Puller.ProcessLoadModelRequest(ctx, req)
+	//	if pullerErr != nil {
+	//		log.Error(pullerErr, "Failed to pull model from storage")
+	//		return nil, pullerErr
+	//	}
+	//}
 
-	if s.AdapterConfig.UseEmbeddedPuller {
-		var pullerErr error
-		req, pullerErr = s.Puller.ProcessLoadModelRequest(ctx, req)
-		if pullerErr != nil {
-			log.Error(pullerErr, "Failed to pull model from storage")
-			return nil, pullerErr
-		}
-	}
+	//var err error
+	//log.Info("-----------")
+	//log.Info("-----------")
+	//log.Info("-----------")
+	//log.Info("-----------")
+	//log.Info("-----------")
+	//log.Info("-----------")
+	//log.Info(req.ModelKey)
+	//schemaPath, err := util.GetSchemaPath(req)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//log.Info(schemaPath)
 
-	var err error
-	schemaPath, err := util.GetSchemaPath(req)
-	if err != nil {
-		return nil, err
-	}
-
-	// using the files downloaded by the puller, create a file layout that the runtime can understand and load from
-	err = adaptModelLayoutForRuntime(ctx, s.AdapterConfig.RootModelDir, req.ModelId, modelType, req.ModelPath, schemaPath, log)
-	if err != nil {
-		log.Error(err, "Failed to create model directory and load model")
-		return nil, status.Errorf(status.Code(err), "Failed to load Model due to adapter error: %s", err)
-	}
+	//// using the files downloaded by the puller, create a file layout that the runtime can understand and load from
+	//err = adaptModelLayoutForRuntime(ctx, s.AdapterConfig.RootModelDir, req.ModelId, modelType, req.ModelPath, schemaPath, log)
+	//if err != nil {
+	//	log.Error(err, "Failed to create model directory and load model")
+	//	return nil, status.Errorf(status.Code(err), "Failed to load Model due to adapter error: %s", err)
+	//}
 
 	_, tritonErr := s.Client.RepositoryModelLoad(ctx, &triton.RepositoryModelLoadRequest{
-		ModelName: req.ModelId,
+		ModelName: "artifacts_02_05_2023_spill_generalized_jit_smp_bd6b62dfd5b64dcfb4970102e2c9b2aa_jit_pt_eede08",
 	})
 	if tritonErr != nil {
 		log.Error(tritonErr, "Triton failed to load model")
@@ -159,6 +166,13 @@ func getModelType(req *mmesh.LoadModelRequest, log logr.Logger) string {
 }
 
 func (s *TritonAdapterServer) UnloadModel(ctx context.Context, req *mmesh.UnloadModelRequest) (*mmesh.UnloadModelResponse, error) {
+	fmt.Println("----------")
+	fmt.Println("----------")
+	fmt.Println("----------")
+	fmt.Println("----------")
+	fmt.Println("----------")
+	fmt.Println("----------")
+	req.ModelId = "artifacts_02_05_2023_spill_generalized_jit_smp_bd6b62dfd5b64dcfb4970102e2c9b2aa_jit_pt_eede08"
 	_, tritonErr := s.Client.RepositoryModelUnload(ctx, &triton.RepositoryModelUnloadRequest{
 		ModelName: req.ModelId,
 	})
@@ -182,18 +196,26 @@ func (s *TritonAdapterServer) UnloadModel(ctx context.Context, req *mmesh.Unload
 		s.Log.Error(err, "Unable to securely join", "rootModelDir", s.AdapterConfig.RootModelDir, "modelId", req.ModelId)
 		return nil, err
 	}
-	err = os.RemoveAll(tritonModelIDDir)
-	if err != nil {
-		return nil, status.Errorf(status.Code(err), "Error while deleting the %s dir: %v", tritonModelIDDir, err)
-	}
 
-	if s.AdapterConfig.UseEmbeddedPuller {
-		// delete files from puller cache
-		err = s.Puller.CleanupModel(req.ModelId)
-		if err != nil {
-			return nil, status.Errorf(status.Code(err), "Failed to delete model files from puller cache: %s", err)
-		}
-	}
+	fmt.Println(tritonModelIDDir)
+	fmt.Println("----------")
+	fmt.Println("----------")
+	fmt.Println("----------")
+	fmt.Println("----------")
+	fmt.Println("----------")
+	fmt.Println("----------")
+	//err = os.RemoveAll(tritonModelIDDir)
+	//if err != nil {
+	//	return nil, status.Errorf(status.Code(err), "Error while deleting the %s dir: %v", tritonModelIDDir, err)
+	//}
+
+	//if s.AdapterConfig.UseEmbeddedPuller {
+	//	// delete files from puller cache
+	//	err = s.Puller.CleanupModel(model_name)
+	//	if err != nil {
+	//		return nil, status.Errorf(status.Code(err), "Failed to delete model files from puller cache: %s", err)
+	//	}
+	//}
 
 	return &mmesh.UnloadModelResponse{}, nil
 }
